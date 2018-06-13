@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>File API Consumer App</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.4/css/mdb.min.css" rel="stylesheet">
+</head>
+<body>
+    @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+    <table cellpadding="10" cellspacing="10">
+        <tr>Upload File</tr>
+        <tr>
+            <td>File</td>
+            <td><input type="file" name="File" /></td>
+            <td>&nbsp;</td>
+            <td><input type="submit" value="Upload" /></td>
+        </tr>
+        
+    </table>
+    }
+
+
+    <div class="col-md-12">
+    <canvas id="myChart" ></canvas>
+    </div>
+
+    
+    <!-- JQuery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.4/js/mdb.min.js"></script>
+
+
+    <script>
+        var uri = 'http://localhost:57412/api/file';
+        var ctx = document.getElementById("myChart").getContext('2d');
+        var labels = [];
+        var data = [];
+        var backgroundColor = [];
+        var borderColor = [];
+
+
+        $(document).ready(createChart());
+        setInterval(refresh, 3000);
+
+        function refresh() {
+
+            //location.reload();
+            labels = [];
+            data = [];
+            backgroundColor = [];
+            borderColor = [];
+            createShuffledChart();
+        }
+
+        function shuffle(arr) {
+            var enumerator = arr.length, temp, index;
+
+            // While there are elements in the array
+            while (enumerator > 0) {
+                // Pick a random index
+                index = Math.floor(Math.random() * enumerator);
+                // Decrease enumerator by 1
+                enumerator--;
+                // And swap the last element with it
+                temp = arr[enumerator];
+                arr[enumerator] = arr[index];
+                arr[index] = temp;
+            }
+            return arr;
+        }
+
+        function getValuesFromAPI() {
+
+        }
+
+        function createChart() {
+            $.getJSON(uri)
+                .done(function (json) {
+                    $.each(json, function (i, value) {
+                        labels.push(value["ID"]);
+                        data.push(value["Height"]);
+                        backgroundColor.push(value["Color"]);
+                        borderColor.push(value["Color"]);
+
+                    });
+
+                    console.log(labels, data, backgroundColor, borderColor);
+                    var myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                label: 'File Data Visualized',
+                                backgroundColor: backgroundColor,
+                                borderColor: borderColor,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                });
+        }
+
+        function createShuffledChart() {
+            $.getJSON(uri)
+                .done(function (json) {
+                    $.each(json, function (i, value) {
+                        labels.push(value["ID"]);
+                        data.push(value["Height"]);
+                        backgroundColor.push(value["Color"]);
+                        borderColor.push(value["Color"]);
+
+                    });
+
+                    
+                    console.log(labels, data, backgroundColor, borderColor);
+                    var myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: shuffle(labels),
+                            datasets: [{
+                                data: shuffle(data),
+                                label: 'File Data Visualized',
+                                backgroundColor: shuffle(backgroundColor),
+                                borderColor: backgroundColor,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                });
+        }
+        
+    </script>
+</body>
+</html>
